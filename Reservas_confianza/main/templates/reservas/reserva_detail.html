@@ -1,0 +1,78 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<section class="hero-section">
+    <div>
+        <h2>Booking details</h2>
+        <p>Complete information about the selected booking.</p>
+    </div>
+
+    <a href="{% url 'reservas_list' %}" class="btn btn-secondary">
+        ← Back
+    </a>
+</section>
+
+<section class="card detail-card">
+    <div class="detail-header">
+        <div>
+            <h3>{{ reserva.cliente }}</h3>
+            <p>Booking #{{ reserva.pk }}</p>
+        </div>
+
+        <span class="estado estado-{{ reserva.estado }}">
+            {{ reserva.get_estado_display }}
+        </span>
+    </div>
+
+    <div class="detail-grid">
+        <div class="detail-item">
+            <span>Customer</span>
+            <strong>{{ reserva.cliente }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>Start date</span>
+            <strong>{{ reserva.fecha_inicio }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>End date</span>
+            <strong>{{ reserva.fecha_fin }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>Status</span>
+            <strong>{{ reserva.get_estado_display }}</strong>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a href="{% url 'reservas_list' %}" class="btn btn-secondary">
+            Back to the list
+        </a>
+
+        {% if perms.main.change_reserva %}
+            <a href="{% url 'reserva_update' reserva.pk %}" class="btn btn-edit">
+                Edit
+            </a>
+
+            {% if not is_customer %}
+            <form method="post" action="{% url 'confirmar_reserva' reserva.pk %}" class="inline-form">
+                {% csrf_token %}<button type="submit" class="btn btn-ok">Confirm</button>
+            </form>
+            <form method="post" action="{% url 'cancelar_reserva' reserva.pk %}" class="inline-form">
+                {% csrf_token %}<button type="submit" class="btn btn-warn">Cancel</button>
+            </form>
+            {% endif %}
+        {% endif %}
+
+        {% if perms.main.delete_reserva %}
+            <a href="{% url 'reserva_delete' reserva.pk %}" class="btn btn-danger">
+                Delete
+            </a>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<section class="hero-section home-hero">
+    <div>
+        <h2>Main dashboard</h2>
+
+        {% if user.is_authenticated %}
+            <p>
+                Welcome, <strong>{{ user.username }}</strong>.
+                From here, you can access the features available for your role.
+            </p>
+        {% else %}
+            <p>
+                Welcome to the booking management system.
+                Log in to access your features.
+            </p>
+        {% endif %}
+    </div>
+
+    {% if not user.is_authenticated %}
+        <a href="{% url 'login' %}" class="btn btn-primary">Log in</a>
+        <a href="{% url 'register' %}" class="btn">Create account</a>
+    {% endif %}
+</section>
+
+{% if user.is_authenticated %}
+
+    <section class="dashboard-grid">
+
+        {% if perms.main.view_reserva %}
+            <article class="dashboard-card">
+                <h3>Bookings</h3>
+                <p>View the bookings registered in the system.</p>
+                <a href="{% url 'reservas_list' %}" class="btn">View bookings</a>
+            </article>
+        {% endif %}
+
+        {% if perms.main.add_reserva %}
+            <article class="dashboard-card">
+                <h3>New booking</h3>
+                <p>Create a new booking for a customer and a date range.</p>
+                <a href="{% url 'reserva_create' %}" class="btn btn-primary">Create booking</a>
+            </article>
+        {% endif %}
+
+        {% if perms.main.change_reserva and not is_customer %}
+            <article class="dashboard-card">
+                <h3>Management</h3>
+                <p>Edit, confirm or cancel existing bookings.</p>
+                <a href="{% url 'gestion_reservas' %}" class="btn btn-edit">Manage</a>
+            </article>
+        {% endif %}
+
+        {% if perms.main.view_reserva and not perms.main.change_reserva %}
+            <article class="dashboard-card">
+                <h3>My bookings</h3>
+                <p>View the bookings associated with your customer account.</p>
+                <a href="{% url 'mis_reservas' %}" class="btn">My bookings</a>
+            </article>
+        {% endif %}
+
+        {% if user.is_staff %}
+            <article class="dashboard-card">
+                <h3>Admin dashboard</h3>
+                <p>Access the Django administration dashboard.</p>
+                <a href="/admin/" class="btn btn-warn">Open admin</a>
+            </article>
+        {% endif %}
+
+    </section>
+
+{% else %}
+
+    <section class="dashboard-grid">
+
+        <article class="dashboard-card">
+            <h3>Customers</h3>
+            <p>Customers can create bookings and check the status of their requests.</p>
+        </article>
+
+        <article class="dashboard-card">
+            <h3>Employees</h3>
+            <p>Employees can manage, edit, confirm and cancel bookings.</p>
+        </article>
+
+        <article class="dashboard-card">
+            <h3>Administrators</h3>
+            <p>Administrators have full access to customers, bookings and the admin dashboard.</p>
+        </article>
+
+    </section>
+
+{% endif %}
+
+{% endblock %}

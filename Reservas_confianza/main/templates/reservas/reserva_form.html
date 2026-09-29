@@ -1,0 +1,50 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<section class="hero-section">
+    <div>
+        <h2>{{ titulo|default:"Booking" }}</h2>
+        <p>Create or edit the booking details.</p>
+    </div>
+</section>
+
+<section class="card form-card">
+    <form method="post" class="styled-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.errors %}
+                    <div class="field-errors">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {{ boton|default:"Save" }}
+            </button>
+
+            <a href="{% url 'reservas_list' %}" class="btn btn-secondary">
+                Back to the list
+            </a>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

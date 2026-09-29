@@ -1,0 +1,137 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="hero-section">
+    <div>
+        <h2>Booking list</h2>
+        <p>View, search and manage all bookings in the system.</p>
+    </div>
+
+    {% if perms.main.add_reserva %}
+        <a href="{% url 'reserva_create' %}" class="btn btn-primary">
+            + Create new booking
+        </a>
+    {% endif %}
+</section>
+
+<section class="card">
+    <form method="get" class="search-form">
+        <input
+            type="text"
+            name="q"
+            placeholder="Search by customer or email..."
+            value="{{ q }}"
+        >
+        <button type="submit">Search</button>
+    </form>
+
+    {% if reservas %}
+        <div class="table-wrapper">
+            <table class="reservas-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Start date</th>
+                        <th>End date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for reserva in reservas %}
+                        <tr>
+                            <td>
+                                <strong>{{ reserva.cliente }}</strong>
+                            </td>
+
+                            <td>{{ reserva.fecha_inicio }}</td>
+
+                            <td>{{ reserva.fecha_fin }}</td>
+
+                            <td>
+                                <span
+                                    id="estado-reserva-{{ reserva.pk }}"
+                                    class="estado estado-{{ reserva.estado }}"
+                                >
+                                    {{ reserva.get_estado_display }}
+                                </span>
+                            </td>
+
+                            <td class="actions">
+                                <a href="{% url 'reserva_detail' reserva.pk %}" class="btn btn-small">
+                                    View
+                                </a>
+
+                                {% if perms.main.change_reserva and not is_customer %}
+                                    <a href="{% url 'reserva_update' reserva.pk %}" class="btn btn-small btn-edit">
+                                        Edit
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'confirmar_reserva' reserva.pk %}"
+                                        class="ajax-estado-form inline-form"
+                                    >
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-small btn-ok">
+                                            Confirm
+                                        </button>
+                                    </form>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'cancelar_reserva' reserva.pk %}"
+                                        class="ajax-estado-form inline-form"
+                                    >
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-small btn-warn">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                {% if perms.main.delete_reserva %}
+                                    <a href="{% url 'reserva_delete' reserva.pk %}" class="btn btn-small btn-danger">
+                                        Delete
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No bookings found</h3>
+            <p>There are no bookings registered yet.</p>
+        </div>
+    {% endif %}
+
+    {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ q }}&page=1">First</a>
+                <a href="?q={{ q }}&page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?q={{ q }}&page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?q={{ q }}&page={{ page_obj.paginator.num_pages }}">Last</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+
+<p class="back-link">
+    <a href="{% url 'index' %}">← Back to home</a>
+</p>
+
+<script src="{% static 'js/reservas.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<section class="hero-section">
+    <div>
+        <h2>Booking management</h2>
+        <p>From this page, you can review, edit, confirm, cancel or delete bookings.</p>
+    </div>
+
+    {% if perms.main.add_reserva %}
+        <a href="{% url 'reserva_create' %}" class="btn btn-primary">
+            + New booking
+        </a>
+    {% endif %}
+</section>
+
+<section class="card">
+    {% if reservas %}
+        <div class="table-wrapper">
+            <table class="reservas-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Start date</th>
+                        <th>End date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for reserva in reservas %}
+                        <tr>
+                            <td>
+                                <strong>{{ reserva.cliente }}</strong>
+                            </td>
+
+                            <td>{{ reserva.fecha_inicio }}</td>
+
+                            <td>{{ reserva.fecha_fin }}</td>
+
+                            <td>
+                                <span class="estado estado-{{ reserva.estado }}">
+                                    {{ reserva.get_estado_display }}
+                                </span>
+                            </td>
+
+                            <td class="actions">
+                                <a href="{% url 'reserva_detail' reserva.pk %}" class="btn btn-small">
+                                    View
+                                </a>
+
+                                {% if perms.main.change_reserva %}
+                                    <a href="{% url 'reserva_update' reserva.pk %}" class="btn btn-small btn-edit">
+                                        Edit
+                                    </a>
+                                {% endif %}
+
+                                {% if perms.main.delete_reserva %}
+                                    <a href="{% url 'reserva_delete' reserva.pk %}" class="btn btn-small btn-danger">
+                                        Delete
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No bookings found</h3>
+            <p>There are no bookings to manage yet.</p>
+        </div>
+    {% endif %}
+</section>
+
+<p class="back-link">
+    <a href="{% url 'index' %}">← Back to home</a>
+</p>
+
+{% endblock %}

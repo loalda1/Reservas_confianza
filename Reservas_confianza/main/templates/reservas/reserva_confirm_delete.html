@@ -1,0 +1,64 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<section class="hero-section danger-hero">
+    <div>
+        <h2>Delete booking</h2>
+        <p>This action will permanently delete the booking.</p>
+    </div>
+
+    <a href="{% url 'reservas_list' %}" class="btn btn-secondary">
+        ← Back
+    </a>
+</section>
+
+<section class="card delete-card">
+    <div class="warning-icon">!</div>
+
+    <h3>Are you sure you want to delete this booking?</h3>
+
+    <p class="delete-text">
+        Before continuing, review the details of the booking you are about to delete.
+    </p>
+
+    <div class="delete-summary">
+        <p>
+            <span>Customer</span>
+            <strong>{{ reserva.cliente }}</strong>
+        </p>
+
+        <p>
+            <span>Start date</span>
+            <strong>{{ reserva.fecha_inicio }}</strong>
+        </p>
+
+        <p>
+            <span>End date</span>
+            <strong>{{ reserva.fecha_fin }}</strong>
+        </p>
+
+        <p>
+            <span>Status</span>
+            <strong>
+                <span class="estado estado-{{ reserva.estado }}">
+                    {{ reserva.get_estado_display }}
+                </span>
+            </strong>
+        </p>
+    </div>
+
+    <form method="post" class="form-actions delete-actions">
+        {% csrf_token %}
+
+        <button type="submit" class="btn btn-danger">
+            Yes, delete booking
+        </button>
+
+        <a href="{% url 'reservas_list' %}" class="btn btn-secondary">
+            Cancel
+        </a>
+    </form>
+</section>
+
+{% endblock %}
